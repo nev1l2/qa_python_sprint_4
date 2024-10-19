@@ -1,3 +1,4 @@
+import pytest
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -23,11 +24,45 @@ class TestBooksCollector:
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
 
-    def test_set_book_genre_install_genre(self):
+    @pytest.fixture
+    def collector_with_book(self):
         collector = BooksCollector()
-        collector.add_new_book('Дюна')
+        for name in ['Дюна', 'Оно', 'Задача трех тел', 'Смешарики']:
+            collector.add_new_book(name)
+        collector.set_book_genre('Смешарики', 'Мультфильмы')
         collector.set_book_genre('Дюна', 'Фантастика')
+        collector.set_book_genre('Оно', 'Ужасы')
+        collector.set_book_genre('Задача трех тел', 'Фантастика')
+        return collector
 
-        assert collector.books_genre['Дюна'] == 'Фантастика'
+    def test_set_book_genre_install_genre(self,collector_with_book):
+        assert collector_with_book.books_genre['Дюна'] == 'Фантастика'
 
+    def test_get_book_genre_outputs_genre_by_name(self,collector_with_book):
+        assert collector_with_book.get_book_genre('Дюна') == 'Фантастика'
 
+    def test_get_books_with_specific_genre_shows_list_of_books_by_genre(self,collector_with_book):
+        assert len(collector_with_book.get_books_with_specific_genre('Фантастика')) == 2 and type(collector_with_book.get_books_with_specific_genre('Фантастика')) == list
+
+    def test_get_books_genre_shows(self,collector_with_book):
+        assert type(collector_with_book.get_books_genre()) == dict
+
+    def test_get_books_for_children_display_list_without_genre_age_rating(self,collector_with_book):
+        assert len(collector_with_book.get_books_for_children()) == 3
+
+    @pytest.mark.parametrize('book_name', ['Дюна', 'Оно', 'Смешарики'])
+    def test_add_book_in_favorites_add_one_book(self,collector_with_book, book_name):
+        collector_with_book.add_book_in_favorites(book_name)
+
+        assert len(collector_with_book.favorites) == 1 and collector_with_book.favorites[0] == book_name
+
+    def test_delete_book_from_favorites_delete_one_book(self,collector_with_book):
+        collector_with_book.delete_book_from_favorites('Дюна')
+
+        assert len(collector_with_book.favorites) == 0
+
+    def test_get_list_of_favorites_books_shows(self,collector_with_book):
+        collector_with_book.add_book_in_favorites('Дюна')
+        collector_with_book.add_book_in_favorites('Оно')
+
+        assert type(collector_with_book.get_list_of_favorites_books()) == list
