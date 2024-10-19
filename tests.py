@@ -17,8 +17,17 @@ class TestBooksCollector:
         collector.add_new_book('Что делать, если ваш кот хочет вас убить')
 
         # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+        # словарь books_genre, который нам возвращает метод get_books_rating, имеет длину 2
+        assert len(collector.get_books_genre()) == 2
 
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+
+    def test_set_book_genre_install_genre(self):
+        collector = BooksCollector()
+        collector.add_new_book('Дюна')
+        collector.set_book_genre('Дюна', 'Фантастика')
+
+        assert collector.books_genre['Дюна'] == 'Фантастика'
+
+
