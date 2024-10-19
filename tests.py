@@ -66,3 +66,17 @@ class TestBooksCollector:
         collector_with_book.add_book_in_favorites('Оно')
 
         assert type(collector_with_book.get_list_of_favorites_books()) == list
+
+    @pytest.mark.parametrize('book_name', ['Я', 'Он','Вдаль от дома', 'Путешествия без границ: В поисках себя!'])
+    def test_add_new_book_checking_the_entered_length_of_the_book_name(self,book_name):
+        collector = BooksCollector()
+        collector.add_new_book(book_name)
+
+        assert book_name in collector.get_books_genre()
+
+    @pytest.mark.parametrize('book_name', ['', 'Путешествия без границ: В поисках себя настоящего!'])
+    def test_add_new_book_book_name_with_an_invalide_length_is_not_added(self, book_name):
+        collector = BooksCollector()
+        collector.add_new_book(book_name)
+
+        assert book_name not in collector.get_books_genre()
