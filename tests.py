@@ -1,4 +1,6 @@
 import pytest
+
+from conftest import collector
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -24,59 +26,63 @@ class TestBooksCollector:
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
 
-    @pytest.fixture
-    def collector_with_book(self):
-        collector = BooksCollector()
-        for name in ['Дюна', 'Оно', 'Задача трех тел', 'Смешарики']:
-            collector.add_new_book(name)
-        collector.set_book_genre('Смешарики', 'Мультфильмы')
+    # тестируем метод set_book_genre - добавляем жанр книге
+    def test_set_book_genre_install_genre(self,collector):
+        collector.add_new_book('Дюна')
         collector.set_book_genre('Дюна', 'Фантастика')
-        collector.set_book_genre('Оно', 'Ужасы')
-        collector.set_book_genre('Задача трех тел', 'Фантастика')
-        return collector
+        assert collector.books_genre['Дюна'] == 'Фантастика'
 
-    def test_set_book_genre_install_genre(self,collector_with_book):
-        assert collector_with_book.books_genre['Дюна'] == 'Фантастика'
-
+    # тестируем метод get_book_genre - получаем жанр книги по её имени
     def test_get_book_genre_outputs_genre_by_name(self,collector_with_book):
+        collector_with_book.get_book_genre('Дюна')
         assert collector_with_book.get_book_genre('Дюна') == 'Фантастика'
 
+    # тестируем метод get_books_with_specific_genre - получаем список книг определенного жанра
     def test_get_books_with_specific_genre_shows_list_of_books_by_genre(self,collector_with_book):
+        collector_with_book.get_books_with_specific_genre('Фантастика')
         assert len(collector_with_book.get_books_with_specific_genre('Фантастика')) == 2 and type(collector_with_book.get_books_with_specific_genre('Фантастика')) == list
 
+    # тестируем метод get_books_genre - получаем словарь
     def test_get_books_genre_shows(self,collector_with_book):
+        collector_with_book.get_books_genre()
         assert type(collector_with_book.get_books_genre()) == dict
 
+    # тестируем метод get_books_for_children - получаем список подходящих для детей книг
     def test_get_books_for_children_display_list_without_genre_age_rating(self,collector_with_book):
+        collector_with_book.get_books_for_children()
         assert len(collector_with_book.get_books_for_children()) == 3
 
-    @pytest.mark.parametrize('book_name', ['Дюна', 'Оно', 'Смешарики'])
-    def test_add_book_in_favorites_add_one_book(self,collector_with_book, book_name):
-        collector_with_book.add_book_in_favorites(book_name)
+    # тестируем метод add_book_in_favorites - добавление книги в избранное
+    def test_add_book_in_favorites_add_one_book(self,collector_with_book):
+        collector_with_book.add_book_in_favorites('Дюна')
+        assert len(collector_with_book.favorites) == 1 and collector_with_book.favorites[0] == 'Дюна'
 
-        assert len(collector_with_book.favorites) == 1 and collector_with_book.favorites[0] == book_name
-
+    # тестируем метод delete_book_from_favorites - удаление книги из избранного
     def test_delete_book_from_favorites_delete_one_book(self,collector_with_book):
+        collector_with_book.add_book_in_favorites('Дюна')
         collector_with_book.delete_book_from_favorites('Дюна')
 
         assert len(collector_with_book.favorites) == 0
 
+    # тестируем метод get_list_of_favorites_books - проверяем что книга добавляется в избранное один раз и выводится списком
     def test_get_list_of_favorites_books_shows(self,collector_with_book):
         collector_with_book.add_book_in_favorites('Дюна')
-        collector_with_book.add_book_in_favorites('Оно')
+        collector_with_book.add_book_in_favorites('Дюна')
 
-        assert type(collector_with_book.get_list_of_favorites_books()) == list
+        assert type(collector_with_book.get_list_of_favorites_books()) == list and len(collector_with_book.get_list_of_favorites_books()) == 1
 
+
+    # ТЕСТЫ СОЗДАНЫ ДЛЯ ВЫПОЛНЕНИЯ ПУНКТА ЧЕК-ЛИСТА ЗАДАНИЯ "ПРИМЕНИТЬ ПАРАМЕТРИЗАЦИЮ"
+    # тестируем метод add_new_book - проверяем КЭ и ГЗ - валидные
     @pytest.mark.parametrize('book_name', ['Я', 'Он','Вдаль от дома', 'Путешествия без границ: В поисках себя!'])
-    def test_add_new_book_checking_the_entered_length_of_the_book_name(self,book_name):
-        collector = BooksCollector()
+    def test_add_new_book_checking_the_entered_length_of_the_book_name(self, collector, book_name):
         collector.add_new_book(book_name)
 
         assert book_name in collector.get_books_genre()
 
+    # тестируем метод add_new_book - проверяем КЭ и ГЗ - невалидные
     @pytest.mark.parametrize('book_name', ['', 'Путешествия без границ: В поисках себя настоящего!'])
-    def test_add_new_book_book_name_with_an_invalide_length_is_not_added(self, book_name):
-        collector = BooksCollector()
+    def test_add_new_book_book_name_with_an_invalide_length_is_not_added(self, collector, book_name):
         collector.add_new_book(book_name)
 
         assert book_name not in collector.get_books_genre()
