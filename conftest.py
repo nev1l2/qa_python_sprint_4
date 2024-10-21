@@ -17,4 +17,3 @@ def collector_with_book():
     collector.set_book_genre('Оно', 'Ужасы')
     collector.set_book_genre('Задача трех тел', 'Фантастика')
     return collector
-
