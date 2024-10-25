@@ -30,46 +30,75 @@ class TestBooksCollector:
     def test_set_book_genre_install_genre(self,collector):
         collector.add_new_book('Дюна')
         collector.set_book_genre('Дюна', 'Фантастика')
+
         assert collector.books_genre['Дюна'] == 'Фантастика'
 
     # тестируем метод get_book_genre - получаем жанр книги по её имени
-    def test_get_book_genre_outputs_genre_by_name(self,collector_with_book):
-        collector_with_book.get_book_genre('Дюна')
-        assert collector_with_book.get_book_genre('Дюна') == 'Фантастика'
+    def test_get_book_genre_outputs_genre_by_name(self, collector):
+        collector.add_new_book('Дюна')
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.get_book_genre('Дюна')
+
+        assert collector.get_book_genre('Дюна') == 'Фантастика'
 
     # тестируем метод get_books_with_specific_genre - получаем список книг определенного жанра
-    def test_get_books_with_specific_genre_shows_list_of_books_by_genre(self,collector_with_book):
-        collector_with_book.get_books_with_specific_genre('Фантастика')
-        assert len(collector_with_book.get_books_with_specific_genre('Фантастика')) == 2 and type(collector_with_book.get_books_with_specific_genre('Фантастика')) == list
+    def test_get_books_with_specific_genre_shows_list_of_books_by_genre(self,collector):
+        for book_name in ['Дюна', 'Вдаль от дома', 'Смешарики']:
+            collector.add_new_book(book_name)
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.set_book_genre('Вдаль от дома', 'Фантастика')
+        collector.set_book_genre('Смешарики', 'Мультфильмы')
+        collector.get_books_with_specific_genre('Фантастика')
+
+        assert len(collector.get_books_with_specific_genre('Фантастика')) == 2 and type(collector.get_books_with_specific_genre('Фантастика')) == list
 
     # тестируем метод get_books_genre - получаем словарь
-    def test_get_books_genre_shows(self,collector_with_book):
-        collector_with_book.get_books_genre()
-        assert type(collector_with_book.get_books_genre()) == dict
+    def test_get_books_genre_shows(self,collector):
+        for book_name in ['Дюна', 'Вдаль от дома', 'Смешарики']:
+            collector.add_new_book(book_name)
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.set_book_genre('Вдаль от дома', 'Фантастика')
+        collector.set_book_genre('Смешарики', 'Мультфильмы')
+        collector.get_books_genre()
+
+        assert type(collector.get_books_genre()) == dict
 
     # тестируем метод get_books_for_children - получаем список подходящих для детей книг
-    def test_get_books_for_children_display_list_without_genre_age_rating(self,collector_with_book):
-        collector_with_book.get_books_for_children()
-        assert len(collector_with_book.get_books_for_children()) == 3
+    def test_get_books_for_children_display_list_without_genre_age_rating(self,collector):
+        for book_name in ['Дюна', 'Оно', 'Смешарики']:
+            collector.add_new_book(book_name)
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.set_book_genre('Оно', 'Ужасы')
+        collector.set_book_genre('Смешарики', 'Мультфильмы')
+        collector.get_books_for_children()
+
+        assert len(collector.get_books_for_children()) == 2
 
     # тестируем метод add_book_in_favorites - добавление книги в избранное
-    def test_add_book_in_favorites_add_one_book(self,collector_with_book):
-        collector_with_book.add_book_in_favorites('Дюна')
-        assert len(collector_with_book.favorites) == 1 and collector_with_book.favorites[0] == 'Дюна'
+    def test_add_book_in_favorites_add_one_book(self, collector):
+        collector.add_new_book('Дюна')
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.add_book_in_favorites('Дюна')
+
+        assert len(collector.favorites) == 1 and collector.favorites[0] == 'Дюна'
 
     # тестируем метод delete_book_from_favorites - удаление книги из избранного
-    def test_delete_book_from_favorites_delete_one_book(self,collector_with_book):
-        collector_with_book.add_book_in_favorites('Дюна')
-        collector_with_book.delete_book_from_favorites('Дюна')
+    def test_delete_book_from_favorites_delete_one_book(self,collector):
+        collector.add_new_book('Дюна')
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.add_book_in_favorites('Дюна')
+        collector.delete_book_from_favorites('Дюна')
 
-        assert len(collector_with_book.favorites) == 0
+        assert len(collector.favorites) == 0
 
     # тестируем метод get_list_of_favorites_books - проверяем что книга добавляется в избранное один раз и выводится списком
-    def test_get_list_of_favorites_books_shows(self,collector_with_book):
-        collector_with_book.add_book_in_favorites('Дюна')
-        collector_with_book.add_book_in_favorites('Дюна')
+    def test_get_list_of_favorites_books_shows(self,collector):
+        collector.add_new_book('Дюна')
+        collector.set_book_genre('Дюна', 'Фантастика')
+        collector.add_book_in_favorites('Дюна')
+        collector.add_book_in_favorites('Дюна')
 
-        assert type(collector_with_book.get_list_of_favorites_books()) == list and len(collector_with_book.get_list_of_favorites_books()) == 1
+        assert type(collector.get_list_of_favorites_books()) == list and len(collector.get_list_of_favorites_books()) == 1
 
 
     # ТЕСТЫ СОЗДАНЫ ДЛЯ ВЫПОЛНЕНИЯ ПУНКТА ЧЕК-ЛИСТА ЗАДАНИЯ "ПРИМЕНИТЬ ПАРАМЕТРИЗАЦИЮ"
